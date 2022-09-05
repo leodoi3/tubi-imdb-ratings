@@ -2,29 +2,23 @@
 // @name         IMDB Ratings on Tubi
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  try to take over the world!
+// @description  Shows IMDB ratings on Tubi
 // @author       You
 // @match        https://tubitv.com/movies/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=bing.com
+// @icon         https://tubitv.com/favicon.ico
 // @grant        none
 // @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
 // ==/UserScript==
 
-// window.addEventListener('load', function () {
-//   //var url = window.location.href;
-//   //if (url.match("https:\/\/tubitv.com\/movies\/\d+") || url.match("127.0.0.1"))
-//   setTimeout(addRecommendedButtons, 3000);
-// this.alert("Hello")
-// }, false);
 
-
-
-waitForElm("div:nth-child(5) > div").then((elm) => {
-  setTimeout(addRecommendedButtons, 1000);
+waitForElm("div.Col.Col > div:nth-child(2)").then((elm) => {
+  //#app > div.tnutt > div > div.rjiTB > div > div.zHQGA > div > div > div > div.Col.Col--9 > div.QBlcb.AbRBx > div.UBdQP
+  setTimeout(addRatingNearTitle,1000);
 });
 
 waitForElm("div:nth-child(5) > div").then((elm) => {
-  //setTimeout(addRecommendedButtons, 1000);
+  //sleep(1500)
+  setTimeout(addRecommendedButtons,1000);
 });
 
 function waitForElm(selector) {
@@ -124,11 +118,15 @@ async function getRating(title, year) {
 }
 
 function getTitle(params) {
- // params.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].innerText
+  // params.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].innerText
   return params.querySelector("h3 > a").innerText
-  
+
 
 }
+function getTitle2(params) {
+  return document.querySelector("div.Col.Col > div > h1").innerText
+}
+
 
 function getYear(params) {
   let year = params.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].innerText
@@ -138,6 +136,43 @@ function getYear(params) {
   return year;
 }
 
+function getYear2(params) {
+  let year = document.querySelector("div.Col.Col > div > div > div > div:nth-child(1)").innerText
+  if (!year.match(/\(\d+\)/)) return ""
+  year = year.replace("(", "")
+  year = year.replace(")", "")
+  return year
+}
+
+function addRatingNearTitle() {
+
+  var title = getTitle2()
+  var year = getYear2()
+  const content = document.querySelector("div.Col.Col  > div:nth-child(2) > div > div")
+  var btn = document.createElement("button");
+
+
+  getRating(title, year).then((data) => {
+    if (data.title != undefined) {
+      btn.innerHTML = data.rating + "/10  - " + data.votes + " votes";
+      btn.onclick = () => { window.open("https://www.imdb.com/title/" + data.id) }
+      btn.setAttribute('title', data.plot)
+      btn.style.marginLeft = "15px"
+
+    }
+    else {
+      btn.onclick = () => { window.open("https://www.google.com/search?q=" + title + " " + year) }
+      btn.innerHTML = "Google Search: " + title + " " + year;
+
+    }
+    
+  btn.style.backgroundColor = "yellow";
+  btn.style.color = "black"
+  content.appendChild(btn);
+  })
+
+
+}
 // var url = window.location.href;
 // if (url.match("https:\/\/tubitv.com\/movies\/\d+") || url.match("127.0.0.1"))
 //   addRecommendedButtons()
