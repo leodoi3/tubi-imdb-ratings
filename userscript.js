@@ -13,7 +13,7 @@
 
 waitForElm("div.Col.Col > div:nth-child(2)").then((elm) => {
   //#app > div.tnutt > div > div.rjiTB > div > div.zHQGA > div > div > div > div.Col.Col--9 > div.QBlcb.AbRBx > div.UBdQP
-  setTimeout(addRatingNearTitle,1000);
+  setTimeout(addRatingNearTitle,2500);
 });
 
 waitForElm("div:nth-child(5) > div").then((elm) => {
@@ -124,7 +124,9 @@ function getTitle(params) {
 
 }
 function getTitle2(params) {
-  return document.querySelector("div.Col.Col > div > h1").innerText
+  //document.querySelector("div.Col.Col > div > h1").innerText
+  return document.getElementsByClassName("VRfHD")[0].innerText
+
 }
 
 
@@ -137,7 +139,8 @@ function getYear(params) {
 }
 
 function getYear2(params) {
-  let year = document.querySelector("div.Col.Col > div > div > div > div:nth-child(1)").innerText
+  let year = document.getElementsByClassName("FhbYS")[0].innerText;
+  //document.querySelector("div.Col.Col > div > div > div > div:nth-child(1)").innerText
   if (!year.match(/\(\d+\)/)) return ""
   year = year.replace("(", "")
   year = year.replace(")", "")
@@ -148,7 +151,8 @@ function addRatingNearTitle() {
 
   var title = getTitle2()
   var year = getYear2()
-  const content = document.querySelector("div.Col.Col  > div:nth-child(2) > div > div")
+  const content = document.getElementsByClassName("iJ7i2")[0];
+  //document.querySelector("div.Col.Col  > div:nth-child(2) > div > div")
   var btn = document.createElement("button");
 
 
