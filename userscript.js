@@ -11,14 +11,23 @@
 // ==/UserScript==
 
 
-waitForElm("div.Col.Col > div:nth-child(2)").then((elm) => {
+
+window.addEventListener("load", ()=> {
+  //alert("loaded")
+ // addRatingNearTitle();
+// addRecommendedButtons();
+}, false)
+
+
+
+waitForElm("div.zHQGA > div > div > div > h1").then((elm) => {
   //#app > div.tnutt > div > div.rjiTB > div > div.zHQGA > div > div > div > div.Col.Col--9 > div.QBlcb.AbRBx > div.UBdQP
   setTimeout(addRatingNearTitle,2500);
 });
 
 waitForElm("div:nth-child(5) > div").then((elm) => {
   //sleep(1500)
-  setTimeout(addRecommendedButtons,1000);
+ setTimeout(addRecommendedButtons,1000);
 });
 
 function waitForElm(selector) {
@@ -46,9 +55,8 @@ function sleep(ms) {
 }
 
 async function addRecommendedButtons() {
-  const content = document.getElementsByClassName("Row Carousel__row")[0].childNodes;
-  const nextBtn = document.querySelector(".Button--round.Carousel__next.Carousel__arrow-active");
-
+  const content = document.getElementsByClassName("web-grid-container web-grid-container--no-margin web-carousel web-carousel--enable-transition")[0].childNodes;
+  const nextBtn = document.getElementsByClassName("web-carousel-shell__next web-carousel-shell__next--for-no-overflowing-item")[0];
 
   for (i = 0; i < 4; i++) {
     if (nextBtn) {
@@ -66,7 +74,7 @@ async function addRecommendedButtons() {
     ;
   }
 
-  const prevBtn = document.querySelector(".Button--round.Carousel__prev.Carousel__arrow-active");;
+  const prevBtn = document.getElementsByClassName("web-carousel-shell__previous web-carousel-shell__previous--for-no-overflowing-item")[0];
   for (i = 0; i < 4; i++) {
     if (prevBtn) {
       prevBtn.click()
@@ -119,19 +127,19 @@ async function getRating(title, year) {
 
 function getTitle(params) {
   // params.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].innerText
-  return params.querySelector("h3 > a").innerText
+  return params.querySelector("a").innerText
 
 
 }
 function getTitle2(params) {
   //document.querySelector("div.Col.Col > div > h1").innerText
-  return document.getElementsByClassName("VRfHD")[0].innerText
+  return document.getElementsByClassName("c1jX9")[0].innerText
 
 }
 
 
 function getYear(params) {
-  let year = params.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].innerText
+  let year = params.getElementsByClassName("web-content-tile__year")[0].innerText;
   if (!year.match(/\(\d+\)/)) return ""
   year = year.replace("(", "")
   year = year.replace(")", "")
@@ -139,7 +147,7 @@ function getYear(params) {
 }
 
 function getYear2(params) {
-  let year = document.getElementsByClassName("FhbYS")[0].innerText;
+  let year = document.getElementsByClassName("web-attributes__meta")[0].innerText;
   //document.querySelector("div.Col.Col > div > div > div > div:nth-child(1)").innerText
   if (!year.match(/\(\d+\)/)) return ""
   year = year.replace("(", "")
@@ -151,7 +159,7 @@ function addRatingNearTitle() {
 
   var title = getTitle2()
   var year = getYear2()
-  const content = document.getElementsByClassName("iJ7i2")[0];
+  const content = document.getElementsByClassName("web-attributes__meta")[0];
   //document.querySelector("div.Col.Col  > div:nth-child(2) > div > div")
   var btn = document.createElement("button");
 
