@@ -6,53 +6,61 @@
 // @author       You
 // @match        https://tubitv.com/movies/*
 // @icon         https://tubitv.com/favicon.ico
-// @grant        none
+// @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
+// @require      http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
 // ==/UserScript==
 
 
 
-window.addEventListener("load", ()=> {
-  //alert("loaded")
- // addRatingNearTitle();
-// addRecommendedButtons();
-}, false)
 
 
+  var fireOnHashChangesToo    = true;
+  var pageURLCheckTimer       = setInterval (
+      function () {
+          if (   this.lastPathStr  !== location.pathname
+              || this.lastQueryStr !== location.search
+              || (fireOnHashChangesToo && this.lastHashStr !== location.hash)
+          ) {
+              this.lastPathStr  = location.pathname;
+              this.lastQueryStr = location.search;
+              this.lastHashStr  = location.hash;
 
-waitForElm("div.zHQGA > div > div > div > h1").then((elm) => {
-  //#app > div.tnutt > div > div.rjiTB > div > div.zHQGA > div > div > div > div.Col.Col--9 > div.QBlcb.AbRBx > div.UBdQP
-  setTimeout(addRatingNearTitle,2500);
-});
-
-waitForElm("div:nth-child(5) > div").then((elm) => {
-  //sleep(1500)
- setTimeout(addRecommendedButtons,1000);
-});
-
-function waitForElm(selector) {
-  return new Promise(resolve => {
-    if (document.querySelector(selector)) {
-      return resolve(document.querySelector(selector));
-    }
-
-    const observer = new MutationObserver(mutations => {
-      if (document.querySelector(selector)) {
-        resolve(document.querySelector(selector));
-        observer.disconnect();
+              waitForKeyElements("div.web-carousel__container",   () => 
+              {
+                addRatingNearTitle();
+                addRecommendedButtons();
+              });
+            }
       }
-    });
+      , 111
+  );
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  });
-}
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+
+// function waitForElm(selector) {
+//   return new Promise(resolve => {
+//     if (document.querySelector(selector)) {
+//       return resolve(document.querySelector(selector));
+//     }
+
+//     const observer = new MutationObserver(mutations => {
+//       if (document.querySelector(selector)) {
+//         resolve(document.querySelector(selector));
+//         observer.disconnect();
+//       }
+//     });
+
+//     observer.observe(document.body, {
+//       childList: true,
+//       subtree: true
+//     });
+//   });
+// }
+
+// function sleep(ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
 
 async function addRecommendedButtons() {
   const content = document.getElementsByClassName("web-grid-container web-grid-container--no-margin web-carousel web-carousel--enable-transition")[0].childNodes;
@@ -61,7 +69,7 @@ async function addRecommendedButtons() {
   for (i = 0; i < 4; i++) {
     if (nextBtn) {
       nextBtn.click()
-      await sleep(500)
+     // await sleep(500)
     }
 
   }
@@ -78,7 +86,7 @@ async function addRecommendedButtons() {
   for (i = 0; i < 4; i++) {
     if (prevBtn) {
       prevBtn.click()
-      await sleep(500)
+     // await sleep(500)
     }
   }
 }
@@ -185,10 +193,6 @@ function addRatingNearTitle() {
 
 
 }
-// var url = window.location.href;
-// if (url.match("https:\/\/tubitv.com\/movies\/\d+") || url.match("127.0.0.1"))
-//   addRecommendedButtons()
-
 
 
 
