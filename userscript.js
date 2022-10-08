@@ -4,14 +4,12 @@
 // @version      0.1
 // @description  Shows IMDB ratings on Tubi
 // @author       You
-// @match        https://tubitv.com/movies/*
+// @match        https://tubitv.com/*
 // @icon         https://tubitv.com/favicon.ico
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
 // ==/UserScript==
-
-
 
 
 
@@ -26,12 +24,13 @@
               this.lastQueryStr = location.search;
               this.lastHashStr  = location.hash;
 
-              waitForKeyElements("div.web-carousel__container",   () => 
-              {
+            if (this.lastPathStr.startsWith("/movie")) {
+              waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container", () => {
                 addRatingNearTitle();
                 addRecommendedButtons();
               });
             }
+          }
       }
       , 111
   );
@@ -58,9 +57,9 @@
 //   });
 // }
 
-// function sleep(ms) {
-//   return new Promise(resolve => setTimeout(resolve, ms));
-// }
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function addRecommendedButtons() {
   const content = document.getElementsByClassName("web-grid-container web-grid-container--no-margin web-carousel web-carousel--enable-transition")[0].childNodes;
@@ -69,7 +68,7 @@ async function addRecommendedButtons() {
   for (i = 0; i < 4; i++) {
     if (nextBtn) {
       nextBtn.click()
-     // await sleep(500)
+      await sleep(250)
     }
 
   }
