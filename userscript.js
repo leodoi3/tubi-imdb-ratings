@@ -9,7 +9,13 @@
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
+// @require            https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @grant              GM_getValue
+// @grant              GM_setValue
+
 // ==/UserScript==
+
+waitForKeyElements("div.nsU2J", addSettingButton, true);
 
 var fireOnHashChangesToo = true;
 var pageURLCheckTimer = setInterval(
@@ -38,6 +44,65 @@ var pageURLCheckTimer = setInterval(
   }
   , 111
 );
+
+
+GM_config.init(
+  {
+    'id': 'tubi-imdb-ratings', // The id used for this instance of GM_config
+    'title' :  `${GM.info.script.name} v${GM.info.script.version} Settings`,
+    'fields': // Fields object
+    {
+      'OMDbApiKey': // This is the id of the field
+      {
+        'label': 'OMDb API Key', // Appears next to field
+        'section' : ['You can request a free OMDb API Key at:', 'https://www.omdbapi.com/apikey.aspx'],
+        'type': 'text', // Makes this setting a text field
+        'title': "Your OMDb API Key",
+        'size' : 20,
+        'default': '' // Default value if user doesn't change it
+      }
+    },
+    css: ':root{--accent:rgb(226, 182, 22);--background:rgb(24, 26, 27);--black:rgb(0, 0, 0);--font:Roboto,Helvetica,Arial,sans-serif;--white:rgb(255, 255, 255)}#tubi-imdb-ratings *{color:var(--white)!important;font-family:var(--font)!important;font-size:14px!important;font-weight:400!important}#tubi-imdb-ratings{background:var(--background)!important}#tubi-imdb-ratings .config_header{font-size:20pt!important;line-height:1.1!important}#tubi-imdb-ratings .section_desc,#tubi-imdb-ratings .section_header{background-color:var(--accent)!important;border:1px solid transparent!important;color:var(--black)!important}#tubi-imdb-ratings .config_var{align-items:center!important;display:flex!important}#tubi-imdb-ratings_field_OMDbApiKey{background-color:var(--white)!important;border:1px solid var(--black)!important;color:var(--black)!important;flex:1!important}#tubi-imdb-ratings button,#tubi-imdb-ratings input[type=button]{background:var(--white)!important;border:1px solid var(--black)!important;color:var(--black)!important}#tubi-imdb-ratings button:hover,#tubi-imdb-ratings input[type=button]:hover{filter:brightness(85%)!important}#tubi-imdb-ratings .reset{margin-right:10px!important}',
+    'events' : 
+    {
+      'init': () => {
+        // initial configuration if OMDb API Key is missing
+        if (!GM_config.isOpen && GM_config.get('OMDbApiKey') === '') {
+          $(() => GM_config.open())
+        }
+      },
+      'save': () => {
+        if (GM_config.isOpen) {
+          if (GM_config.get('OMDbApiKey') === '') {
+            alert('check your settings and save')
+          } else {
+            alert('settings saved')
+            GM_config.close()
+            setTimeout(window.location.reload(false), 500)
+          }
+        }
+      }
+     // 'close': function() { alert('onClose()'); },
+     // 'reset': function() { alert('onReset()'); }
+    } 
+  });
+
+  /**
+   * Adds a link to the menu to access the script configuration
+   */
+function addSettingButton() {
+  const navBar =   document.getElementsByClassName("nsU2J")[0]
+  var btn = document.createElement("button");
+  btn.innerHTML = "Get IMDB rating";
+  btn.onclick = () => {
+   // console.log(GM_config.get("ApiKey"))
+    GM_config.open();
+  }
+  btn.style.backgroundColor = "black";
+  btn.innerHTML = "Tubi IMDB Ratings"
+  btn.style.color = "white"
+  navBar.appendChild(btn);
+}
 
 async function addHomeRecommendedButtons(row) {
   const movieRow = row[0].getElementsByClassName("web-grid-container web-carousel web-carousel--enable-transition");
