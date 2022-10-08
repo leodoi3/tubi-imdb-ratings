@@ -11,113 +11,92 @@
 // @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
 // ==/UserScript==
 
+var fireOnHashChangesToo = true;
+var pageURLCheckTimer = setInterval(
+  function () {
+    if (this.lastPathStr !== location.pathname
+      || this.lastQueryStr !== location.search
+      || (fireOnHashChangesToo && this.lastHashStr !== location.hash)
+    ) {
+      this.lastPathStr = location.pathname;
+      this.lastQueryStr = location.search;
+      this.lastHashStr = location.hash;
 
-
-  var fireOnHashChangesToo    = true;
-  var pageURLCheckTimer       = setInterval (
-      function () {
-          if (   this.lastPathStr  !== location.pathname
-              || this.lastQueryStr !== location.search
-              || (fireOnHashChangesToo && this.lastHashStr !== location.hash)
-          ) {
-              this.lastPathStr  = location.pathname;
-              this.lastQueryStr = location.search;
-              this.lastHashStr  = location.hash;
-
-            if (this.lastPathStr.startsWith("/movie")) {
-              waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container", () => {
-                addRatingNearTitle();
-                addRecommendedButtons();
-              });
-            }
-          }
+      if (this.lastPathStr.startsWith("/movie")) {
+        waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container", () => {
+          addRatingNearTitle();
+          addRecommendedButtons();
+        });
       }
-      , 111
-  );
+      else if (this.lastPathStr.startsWith("/home")) { //adds buttons on the homepage
+        waitForKeyElements("div.web-carousel__container", (row) => {
+          addHomeRecommendedButtons(row);
+        });
+      }
+      
+    }
+  }
+  , 111
+);
 
-
-
-// function waitForElm(selector) {
-//   return new Promise(resolve => {
-//     if (document.querySelector(selector)) {
-//       return resolve(document.querySelector(selector));
-//     }
-
-//     const observer = new MutationObserver(mutations => {
-//       if (document.querySelector(selector)) {
-//         resolve(document.querySelector(selector));
-//         observer.disconnect();
-//       }
-//     });
-
-//     observer.observe(document.body, {
-//       childList: true,
-//       subtree: true
-//     });
-//   });
-// }
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+async function addHomeRecommendedButtons(row) {
+  const movieRow = row[0].getElementsByClassName("web-grid-container web-carousel web-carousel--enable-transition");
+  for (let row of movieRow) {
+    for (let item of row.childNodes) {
+      try {
+        addButton(item);
+      }
+      catch (e) { console.log(e) };
+    };
+  }
 }
 
 async function addRecommendedButtons() {
-  const content = document.getElementsByClassName("web-grid-container web-grid-container--no-margin web-carousel web-carousel--enable-transition")[0].childNodes;
-  const nextBtn = document.getElementsByClassName("web-carousel-shell__next web-carousel-shell__next--for-no-overflowing-item")[0];
+  const movieColumns = document.getElementsByClassName("web-grid-container web-grid-container--no-margin web-carousel web-carousel--enable-transition")[0].childNodes;
 
-  for (i = 0; i < 4; i++) {
-    if (nextBtn) {
-      nextBtn.click()
-      await sleep(250)
-    }
-
-  }
-
-  for (let item of content) {
+  //console.log(movieColumns)
+  for (let item of movieColumns) {
     try {
       addButton(item);
     }
     catch (e) { console.log(e) }
     ;
   }
-
-  const prevBtn = document.getElementsByClassName("web-carousel-shell__previous web-carousel-shell__previous--for-no-overflowing-item")[0];
-  for (i = 0; i < 4; i++) {
-    if (prevBtn) {
-      prevBtn.click()
-     // await sleep(500)
-    }
-  }
 }
-
-
 
 function addButton(item) {
   var title = getTitle(item);
   var year = getYear(item);
   var btn = document.createElement("button");
 
-  //console.log(title)
-  getRating(title, year).then((data) => {
-    if (data.title != undefined) {
-      btn.innerHTML = data.rating + "/10" + "<br>" + data.votes + " votes";
-      btn.onclick = () => { window.open("https://www.imdb.com/title/" + data.id) }
-      btn.setAttribute('title', data.plot)
+  btn.innerHTML = "Get IMDB rating";
+  btn.onclick = () => {
+    getRating(title, year).then((data) => {
+      if (data.title != undefined) {
+        btn.innerHTML = data.rating + "/10" + "<br>" + data.votes + " votes";
+        btn.onclick = () => { window.open("https://www.imdb.com/title/" + data.id) }
+        btn.setAttribute('title', data.plot)
+
+      }
+      else {
+        btn.onclick = () => { window.open("https://www.google.com/search?q=" + title + " " + year) }
+        btn.innerHTML = "Google Search: " + title + " " + year;
+        btn.setAttribute('title', btn.innerHTML)
+
+      }
 
     }
-    else {
-      btn.onclick = () => { window.open("https://www.google.com/search?q=" + title + " " + year) }
-      btn.innerHTML = "Google Search: " + title + " " + year;
-
-    }
-    btn.style.backgroundColor = "yellow";
-    btn.style.color = "black"
-    item.appendChild(btn);
-
+    ).catch((err) => {console.error(err)})
   }
-  )
+  btn.style.backgroundColor = "yellow";
+  btn.style.color = "black"
+  item.appendChild(btn);
+
+
+
 
 }
+
 
 async function getRating(title, year) {
   const response = await fetch("https://www.omdbapi.com/?apikey=57c52853" + "&t=" + title + "&y=" + year)
@@ -147,7 +126,7 @@ function getTitle2(params) {
 
 function getYear(params) {
   let year = params.getElementsByClassName("web-content-tile__year")[0].innerText;
-  if (!year.match(/\(\d+\)/)) return ""
+  if (!year.match(/\(?\d+\)?/)) return ""
   year = year.replace("(", "")
   year = year.replace(")", "")
   return year;
@@ -156,7 +135,7 @@ function getYear(params) {
 function getYear2(params) {
   let year = document.getElementsByClassName("web-attributes__meta")[0].innerText;
   //document.querySelector("div.Col.Col > div > div > div > div:nth-child(1)").innerText
-  if (!year.match(/\(\d+\)/)) return ""
+  if (!year.match(/\(?\d+\)?/)) return ""
   year = year.replace("(", "")
   year = year.replace(")", "")
   return year
@@ -184,10 +163,10 @@ function addRatingNearTitle() {
       btn.innerHTML = "Google Search: " + title + " " + year;
 
     }
-    
-  btn.style.backgroundColor = "yellow";
-  btn.style.color = "black"
-  content.appendChild(btn);
+
+    btn.style.backgroundColor = "yellow";
+    btn.style.color = "black"
+    content.appendChild(btn);
   })
 
 
