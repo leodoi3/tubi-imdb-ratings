@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         IMDB Ratings on Tubi
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/leodoi3/tubi-imdb-ratings
 // @version      0.1
 // @description  Shows IMDB ratings on Tubi
 // @author       leodoi3
