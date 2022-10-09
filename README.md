@@ -17,7 +17,7 @@ This script adds IMDb ratings on the [Tubi](https://tubitv.com/) website.
 
 
 ## Setup
-You will need a free [OMDb API key](https://www.omdbapi.com/) and enter the key in the settings page. 
+You will need a free [OMDb API key](https://www.omdbapi.com/apikey.aspx) and enter the key in the settings page. 
 
 ![](screenshots/config.jpg)
 
