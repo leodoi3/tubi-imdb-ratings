@@ -10,13 +10,13 @@
 // @downloadURL  https://github.com/leodoi3/tubi-imdb-ratings/raw/master/tubi-imdb-ratings-userscript.js
 // @match        https://tubitv.com/*
 // @icon         https://tubitv.com/favicon.ico
-// @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
+// @require      https://greasyfork.org/scripts/383527-wait-for-key-elements/code/Wait_for_key_elements.js?version=701631
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @license      MIT
 // ==/UserScript==
-
 
 var fireOnHashChangesToo = true;
 setInterval(() => {
@@ -30,13 +30,13 @@ setInterval(() => {
 
     waitForKeyElements("div.EcToA", addSettingButton, true);
 
-    if (lastPathStr.startsWith("/movie") && GM_config.get('OMDbApiKey') !== '') { //adds buttons on the watch page
+    if (lastPathStr.startsWith("/movie") && GM_config.get('OMDbApiKey') !== '') { //Adds buttons on the watch page
       waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container > div", (row) => {
         addRatingNearTitle();
         addRecommendedButtons(row);
       });
     }
-    else if (lastPathStr.startsWith("/home") && GM_config.get('OMDbApiKey') !== '') { //adds buttons on the homepage
+    else if (lastPathStr.startsWith("/home") && GM_config.get('OMDbApiKey') !== '') { //Adds buttons on the homepage
       waitForKeyElements("div.web-carousel__container > div", (row) => {
         //console.log(row)
         addRecommendedButtons(row);
@@ -91,7 +91,7 @@ GM_config.init(
   });
 
 /**
- * Adds a link to the menu to access the script configuration
+ * Adds a button to the menu to access the script configuration
  */
 function addSettingButton() {
   const navBar = document.getElementsByClassName("EcToA")[0]
@@ -133,10 +133,10 @@ function addButton(item) {
         btn.onclick = () => { window.open(`https://www.imdb.com/title/${data.id}`) }
         btn.setAttribute('title', data.plot)
       }
-      else {
+      else { //If the IMDB rating cannot be found, provide a Google search query 
         btn.setAttribute('title', btn.innerHTML)
         btn.onclick = () => {
-          title = title.replaceAll(" ", "%20");
+          title = title.replaceAll(" ", "%20"); //URL encoding
           title = title.replaceAll("&", "%26");
           title = title.replaceAll("'", "%27");
           window.open(`https://www.google.com/search?q=${title}%20${year}`)
@@ -155,7 +155,7 @@ function addButton(item) {
 
 
 async function getRating(title, year) {
-  title = title.replaceAll(" ", "%20");
+  title = title.replaceAll(" ", "%20"); //URL encode
   title = title.replaceAll("&", "%26");
   title = title.replaceAll("'", "%27");
   console.log(`https://www.omdbapi.com/?apikey=${GM_config.get("OMDbApiKey")}&t=${title}&y=${year}`)
@@ -171,16 +171,19 @@ async function getRating(title, year) {
   };
 }
 
-function getTitle(params) {
+//Used for movie recommendations
+function getTitle(params) { 
   // params.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].innerText
   return params.querySelector("a").innerText
 }
 
-function getTitle2(params) {
+//Used for watch page
+function getTitle2(params) { 
   //document.querySelector("div.Col.Col > div > h1").innerText
   return document.getElementsByClassName("c1jX9")[0].innerText
 }
 
+//Used for movie recommendations
 function getYear(params) {
   let year = params.getElementsByClassName("web-content-tile__year")[0].innerText;
   if (!year.match(/\(?\d+\)?/)) return ""
@@ -189,6 +192,7 @@ function getYear(params) {
   return year;
 }
 
+//Used for watch page
 function getYear2(params) {
   let year = document.getElementsByClassName("web-attributes__meta")[0].innerText;
   //document.querySelector("div.Col.Col > div > div > div > div:nth-child(1)").innerText
@@ -214,7 +218,7 @@ function addRatingNearTitle() {
       btn.style.marginLeft = "15px"
 
     }
-    else {
+    else { //If the IMDB rating cannot be found, provide a Google search query 
       btn.onclick = () => { window.open("https://www.google.com/search?q=" + title + " " + year) }
       btn.innerHTML = "Google Search: " + title + " " + year;
 
