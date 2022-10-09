@@ -3,16 +3,14 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  Shows IMDB ratings on Tubi
-// @author       You
+// @author       leodoi3
 // @match        https://tubitv.com/*
 // @icon         https://tubitv.com/favicon.ico
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
-// @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @grant        GM_getValue
 // @grant        GM_setValue
-
 // ==/UserScript==
 
 
@@ -28,13 +26,13 @@ setInterval(() => {
 
     waitForKeyElements("div.EcToA", addSettingButton, true);
 
-    if (lastPathStr.startsWith("/movie")) {
+    if (lastPathStr.startsWith("/movie") && GM_config.get('OMDbApiKey') !== '') { //adds buttons on the watch page
       waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container > div", (row) => {
         addRatingNearTitle();
         addRecommendedButtons(row);
       });
     }
-    else if (lastPathStr.startsWith("/home")) { //adds buttons on the homepage
+    else if (lastPathStr.startsWith("/home") && GM_config.get('OMDbApiKey') !== '') { //adds buttons on the homepage
       waitForKeyElements("div.web-carousel__container > div", (row) => {
         //console.log(row)
         addRecommendedButtons(row);
