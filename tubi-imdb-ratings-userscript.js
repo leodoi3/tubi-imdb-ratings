@@ -9,13 +9,12 @@
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require      file:///C:\Users\matte\Repos\tubi-imdb-ratings\userscript.js
-// @require            https://openuserjs.org/src/libs/sizzle/GM_config.js
-// @grant              GM_getValue
-// @grant              GM_setValue
+// @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @grant        GM_getValue
+// @grant        GM_setValue
 
 // ==/UserScript==
 
-waitForKeyElements("div.nsU2J", addSettingButton, true);
 
 var fireOnHashChangesToo = true;
 setInterval(() => {
@@ -26,6 +25,8 @@ setInterval(() => {
     this.lastPathStr = location.pathname;
     this.lastQueryStr = location.search;
     this.lastHashStr = location.hash;
+
+    waitForKeyElements("div.EcToA", addSettingButton, true);
 
     if (lastPathStr.startsWith("/movie")) {
       waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container > div", (row) => {
@@ -91,7 +92,7 @@ GM_config.init(
  * Adds a link to the menu to access the script configuration
  */
 function addSettingButton() {
-  const navBar = document.getElementsByClassName("nsU2J")[0]
+  const navBar = document.getElementsByClassName("EcToA")[0]
   var btn = document.createElement("button");
   btn.innerHTML = "Get IMDB rating";
   btn.onclick = () => {
@@ -99,7 +100,7 @@ function addSettingButton() {
     GM_config.open();
   }
   btn.style.backgroundColor = "black";
-  btn.innerHTML = "Tubi IMDB Ratings"
+  btn.innerHTML = "IMDb Ratings Tubi"
   btn.style.color = "white"
   navBar.appendChild(btn);
 }
