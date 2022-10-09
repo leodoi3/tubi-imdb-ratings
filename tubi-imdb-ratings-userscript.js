@@ -4,6 +4,10 @@
 // @version      0.1
 // @description  Shows IMDB ratings on Tubi
 // @author       leodoi3
+// @supportURL   https://github.com/leodoi3/tubi-imdb-ratings/issues
+// @homepageURL  https://github.com/leodoi3/tubi-imdb-ratings
+// @updateURL    https://github.com/leodoi3/tubi-imdb-ratings/raw/master/tubi-imdb-ratings-userscript.js
+// @downloadURL  https://github.com/leodoi3/tubi-imdb-ratings/raw/master/tubi-imdb-ratings-userscript.js
 // @match        https://tubitv.com/*
 // @icon         https://tubitv.com/favicon.ico
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
