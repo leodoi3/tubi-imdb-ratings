@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IMDB Ratings on Tubi
 // @namespace    https://github.com/leodoi3/tubi-imdb-ratings
-// @version      0.1
+// @version      0.11
 // @description  Shows IMDB ratings on Tubi
 // @author       leodoi3
 // @supportURL   https://github.com/leodoi3/tubi-imdb-ratings/issues
@@ -29,12 +29,9 @@ setInterval(() => {
     this.lastHashStr = location.hash;
 
     waitForKeyElements("div.EcToA", addSettingButton, true);
-
     if (lastPathStr.startsWith("/movie") && GM_config.get('OMDbApiKey') !== '') { //Adds buttons on the watch page
-      waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container > div", (row) => {
-        addRatingNearTitle();
-        addRecommendedButtons(row);
-      });
+      waitForKeyElements("div.web-carousel-shell.t3vzq > div.web-carousel__container > div", (row) => {addRecommendedButtons(row)});
+      waitForKeyElements("div.web-attributes > div.web-attributes__meta", (elem) => {addRatingNearTitle(elem)});
     }
     else if (lastPathStr.startsWith("/home") && GM_config.get('OMDbApiKey') !== '') { //Adds buttons on the homepage
       waitForKeyElements("div.web-carousel__container > div", (row) => {
@@ -203,10 +200,11 @@ function getYear2(params) {
   return year
 }
 
-function addRatingNearTitle() {
+function addRatingNearTitle(elem) {
   var title = getTitle2()
   var year = getYear2()
-  const content = document.getElementsByClassName("web-attributes__meta")[0];
+  const content = elem[0];
+
   //document.querySelector("div.Col.Col  > div:nth-child(2) > div > div")
   var btn = document.createElement("button");
 
